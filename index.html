@@ -1176,7 +1176,7 @@ body[data-theme="cute"] {
             height: 100%;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 保持外层不滚动 */
+            max-height: 80vh; /* 确保不超出模态弹窗 */
         }
 
         /* 顶部导航栏 */
@@ -1328,13 +1328,16 @@ body[data-theme="cute"] {
         .social-profile-tab-content {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             background: white;
             min-height: 0; /* 确保flex子元素可以缩小 */
             -webkit-overflow-scrolling: touch; /* iOS平滑滚动 */
+            height: 0; /* 强制flex子元素计算高度 */
         }
 
         .social-profile-posts-list {
             padding: 20px;
+            min-height: 100%; /* 确保有足够高度触发滚动 */
         }
 
         .social-profile-post-item {
@@ -11364,10 +11367,54 @@ function applyWeiboCardOpacity(opacity) {
                 followersCount = Math.max(baseFollowers, Math.floor(postsCount * (8 + Math.random() * 15))); // 每条微博带来8-23个粉丝
                 followingCount = Math.max(50, Math.floor(postsCount * (2 + Math.random() * 4))); // 关注数相对较少
             } else {
-                // AI角色可能有更多粉丝
-                const baseFollowers = 300 + Math.floor(Math.random() * 500); // 300-800基础粉丝
-                followersCount = Math.max(baseFollowers, Math.floor(postsCount * (15 + Math.random() * 25))); // 每条微博带来15-40个粉丝
-                followingCount = Math.max(30, Math.floor(postsCount * (1 + Math.random() * 3))); // 关注数较少
+                // AI角色粉丝数 - 根据人设类型生成合理的粉丝数量
+                const chat = state.chats[authorId];
+                const persona = (chat?.settings?.aiPersona || '').toLowerCase();
+
+                let baseFollowers, followerMultiplier;
+
+                // 根据角色人设类型调整粉丝基数和倍数
+                if (persona.includes('主播') || persona.includes('网红') || persona.includes('up主') ||
+                    persona.includes('博主') || persona.includes('直播') || persona.includes('网络主播') ||
+                    persona.includes('游戏主播') || persona.includes('美妆博主') || persona.includes('时尚博主')) {
+                    // 主播/网红类型 - 高粉丝基数
+                    baseFollowers = 8000 + Math.floor(Math.random() * 12000); // 8K-20K基础粉丝
+                    followerMultiplier = [50, 80]; // 每条微博带来50-130个粉丝
+                } else if (persona.includes('明星') || persona.includes('艺人') || persona.includes('演员') ||
+                          persona.includes('歌手') || persona.includes('偶像') || persona.includes('爱豆')) {
+                    // 明星类型 - 超高粉丝基数
+                    baseFollowers = 50000 + Math.floor(Math.random() * 100000); // 50K-150K基础粉丝
+                    followerMultiplier = [100, 200]; // 每条微博带来100-300个粉丝
+                } else if (persona.includes('小草') || persona.includes('普通人') || persona.includes('学生') ||
+                          persona.includes('上班族') || persona.includes('社畜') || persona.includes('打工人') ||
+                          persona.includes('新人') || persona.includes('萌新')) {
+                    // 小草/普通人类型 - 低粉丝基数
+                    baseFollowers = 50 + Math.floor(Math.random() * 150); // 50-200基础粉丝
+                    followerMultiplier = [3, 8]; // 每条微博带来3-11个粉丝
+                } else if (persona.includes('专家') || persona.includes('教授') || persona.includes('老师') ||
+                          persona.includes('医生') || persona.includes('律师') || persona.includes('作家') ||
+                          persona.includes('知识分子') || persona.includes('学者')) {
+                    // 专业人士类型 - 中等粉丝基数
+                    baseFollowers = 2000 + Math.floor(Math.random() * 3000); // 2K-5K基础粉丝
+                    followerMultiplier = [20, 35]; // 每条微博带来20-55个粉丝
+                } else if (persona.includes('网络达人') || persona.includes('kol') || persona.includes('意见领袖') ||
+                          persona.includes('大v') || persona.includes('知名') || persona.includes('有名')) {
+                    // 网络达人类型 - 高粉丝基数
+                    baseFollowers = 15000 + Math.floor(Math.random() * 25000); // 15K-40K基础粉丝
+                    followerMultiplier = [60, 100]; // 每条微博带来60-160个粉丝
+                } else if (persona.includes('企业家') || persona.includes('ceo') || persona.includes('老板') ||
+                          persona.includes('创业者') || persona.includes('商人')) {
+                    // 企业家类型 - 中高粉丝基数
+                    baseFollowers = 5000 + Math.floor(Math.random() * 10000); // 5K-15K基础粉丝
+                    followerMultiplier = [30, 50]; // 每条微博带来30-80个粉丝
+                } else {
+                    // 默认类型 - 中等粉丝基数
+                    baseFollowers = 500 + Math.floor(Math.random() * 1000); // 500-1500基础粉丝
+                    followerMultiplier = [15, 25]; // 每条微博带来15-40个粉丝
+                }
+
+                followersCount = Math.max(baseFollowers, Math.floor(postsCount * (followerMultiplier[0] + Math.random() * (followerMultiplier[1] - followerMultiplier[0]))));
+                followingCount = Math.max(30, Math.floor(followersCount * (0.05 + Math.random() * 0.15))); // 关注数为粉丝数的5%-20%
             }
 
             // 更新统计信息
@@ -11453,7 +11500,8 @@ function applyWeiboCardOpacity(opacity) {
             if (posts.length === 0) {
                 container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">暂无动态</div>';
             } else {
-                posts.slice(0, 10).forEach(post => {
+                // 显示所有动态，不限制数量，确保有足够内容滚动
+                posts.forEach(post => {
                     const postItem = document.createElement('div');
                     postItem.className = 'social-profile-post-item';
 
@@ -11473,6 +11521,19 @@ function applyWeiboCardOpacity(opacity) {
                     postItem.appendChild(postTime);
                     container.appendChild(postItem);
                 });
+
+                // 如果动态较少，添加一些占位内容确保可以滚动测试
+                if (posts.length < 8) {
+                    for (let i = 0; i < 10; i++) {
+                        const testItem = document.createElement('div');
+                        testItem.className = 'social-profile-post-item';
+                        testItem.innerHTML = `
+                            <div class="social-profile-post-content">测试动态内容 ${i + 1} - 这是一条用于测试滚动功能的动态内容</div>
+                            <div class="social-profile-post-time">2024-01-${String(i + 1).padStart(2, '0')}</div>
+                        `;
+                        container.appendChild(testItem);
+                    }
+                }
             }
         }
 
