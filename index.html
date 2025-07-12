@@ -50,20 +50,68 @@ body[data-theme="cute"] {
     --theme-shadow: 0 4px 10px rgba(255, 105, 180, 0.15);
 }
         html { height: 100%; overflow: hidden; }
-        body { 
-    height: 100%; 
-    overflow: hidden; 
-    margin: 0; 
-    padding: 20px; 
-    font-family: var(--theme-font-family); 
-    font-weight: normal; 
-    background-color: #dcdcdc; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    box-sizing: border-box; 
+        body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 20px;
+    font-family: var(--theme-font-family);
+    font-weight: normal;
+    background-color: #dcdcdc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
     transition: all 0.3s ease;
 }
+
+        /* 无边框模式样式 */
+        body.borderless-mode {
+            padding: 0;
+            background-color: #000;
+        }
+
+        body.borderless-mode #phone-frame {
+            padding: 0;
+            background-color: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.borderless-mode #phone-screen {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+            max-width: none;
+            max-height: none;
+        }
+
+        /* 无边框模式开关样式美化 */
+        .borderless-mode-label {
+            transition: all 0.3s ease;
+        }
+
+        .borderless-mode-label:hover {
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 4px 12px rgba(74, 132, 193, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .borderless-mode-label input[type="checkbox"]:checked + div {
+            color: var(--accent-color);
+        }
+
+        .borderless-mode-label input[type="checkbox"]:checked {
+            accent-color: var(--accent-color);
+        }
+
+
         body[data-weibo-theme="white"] { --weibo-bg: #fff; --weibo-main: #222; --weibo-accent: #ff69b4; --weibo-card-bg: #fff; --weibo-card-border: #eee; --weibo-content-color: #222; }
         body[data-weibo-theme="pink"] { --weibo-bg: #ffe4ec; --weibo-main: #c2185b; --weibo-accent: #e91e63; --weibo-card-bg: #fff0f6; --weibo-card-border: #f8bbd0; --weibo-content-color: #c2185b; }
         body[data-weibo-theme="blue"] { --weibo-bg: #e3f0ff; --weibo-main: #1565c0; --weibo-accent: #2196f3; --weibo-card-bg: #f0f8ff; --weibo-card-border: #b3e5fc; --weibo-content-color: #1565c0; }
@@ -1094,28 +1142,216 @@ body[data-theme="cute"] {
         #battery-alert-image { max-width: 100px; max-height: 100px; margin-bottom: 15px; }
         #battery-alert-text { font-size: 16px; font-weight: 500; color: #333; margin: 0; line-height: 1.4; }
 
-        /* 社交主页弹窗样式 */
-        #social-profile-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 2000; opacity: 0; transition: opacity 0.3s ease; }
-        #social-profile-modal.visible { display: flex; opacity: 1; }
-        .social-profile-content { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); background-size: cover; background-position: center; width: 90%; max-width: 320px; border-radius: 20px; overflow: hidden; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
-        #social-profile-modal.visible .social-profile-content { transform: scale(1); }
-        .social-profile-header { position: relative; padding: 40px 20px 20px; text-align: center; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); }
-        .social-profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.8); margin: 0 auto 15px; object-fit: cover; }
-        .social-profile-name { font-size: 20px; font-weight: 600; color: white; margin-bottom: 5px; }
-        .social-profile-signature { font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.4; margin-bottom: 15px; }
-        .social-profile-stats { display: flex; justify-content: center; margin-bottom: 15px; }
-        .social-profile-stat { padding: 0 15px; text-align: center; position: relative; }
-        .social-profile-stat:not(:last-child):after { content: ""; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 1px; height: 70%; background: rgba(255,255,255,0.3); }
-        .social-profile-stat-number { font-size: 18px; font-weight: 600; color: white; margin-bottom: 2px; }
-        .social-profile-stat-label { font-size: 12px; color: rgba(255,255,255,0.8); }
-        .social-profile-edit-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: none; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
-        .social-profile-edit-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
-        .social-profile-posts { background: white; padding: 15px; max-height: 200px; overflow-y: auto; }
-        .social-profile-posts-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #333; }
-        .social-profile-post-item { padding: 8px 0; border-bottom: 1px solid #f0f2f5; font-size: 13px; color: #666; line-height: 1.4; }
-        .social-profile-post-item:last-child { border-bottom: none; }
-        .social-profile-close { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: none; color: white; font-size: 18px; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 20px; transition: all 0.2s; font-weight: bold; z-index: 1000; }
-        .social-profile-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+        /* 社交主页模态弹窗样式 */
+        .social-profile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .social-profile-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f5f5f5;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+
+
+        .social-profile-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 顶部导航栏 */
+        .social-profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            flex-shrink: 0;
+        }
+
+        .social-profile-back {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .social-profile-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .social-profile-edit-btn {
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #7b9faf; /* 默认雾霾蓝背景 */
+        }
+
+        /* 根据主题设置编辑按钮颜色 */
+        [data-weibo-theme="white"] .social-profile-edit-btn {
+            background: #7b9faf; /* 雾霾蓝 */
+        }
+
+        [data-weibo-theme="white"] .social-profile-edit-btn:hover {
+            background: #6a96ab;
+            transform: translateY(-1px);
+        }
+
+        [data-weibo-theme="pink"] .social-profile-edit-btn {
+            background: #d4a5a5; /* 雾霾粉 */
+        }
+
+        [data-weibo-theme="pink"] .social-profile-edit-btn:hover {
+            background: #c99494;
+            transform: translateY(-1px);
+        }
+
+        [data-weibo-theme="dark"] .social-profile-edit-btn {
+            background: #7b9faf; /* 雾霾蓝 */
+        }
+
+        [data-weibo-theme="dark"] .social-profile-edit-btn:hover {
+            background: #6a96ab;
+            transform: translateY(-1px);
+        }
+
+        /* 用户信息区域 */
+        .social-profile-user-section {
+            flex-shrink: 0;
+            margin-bottom: -10px; /* 让用户信息区域更贴近标签页 */
+        }
+
+        .social-profile-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+            background-position: center;
+            padding: 30px 20px 50px; /* 上边距小一些，下边距大一些，让内容偏下 */
+            display: flex;
+            align-items: flex-end; /* 让内容靠近底部 */
+            gap: 20px;
+            min-height: 160px; /* 保持原来的高度 */
+        }
+
+        .social-profile-avatar {
+            width: 90px; /* 恢复原来的头像大小 */
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.8);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .social-profile-user-info {
+            flex: 1;
+            color: white;
+        }
+
+        .social-profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .social-profile-signature {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .social-profile-stats {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-profile-stat {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* 标签页样式 */
+        .social-profile-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #eee;
+            flex-shrink: 0;
+        }
+
+        .social-profile-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .social-profile-tab.active {
+            color: #ff6b6b;
+            border-bottom-color: #ff6b6b;
+        }
+
+        /* 内容区域 */
+        .social-profile-tab-content {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .social-profile-posts-list {
+            padding: 20px;
+        }
+
+        .social-profile-post-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .social-profile-post-content {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .social-profile-post-time {
+            font-size: 12px;
+            color: #999;
+        }
+
 
         .retry-btn {
           display: inline-flex;
@@ -2098,7 +2334,7 @@ body[data-theme="cute"] {
         <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
         <span class="header-title">微博</span>
         <div class="header-actions">
-            <span class="action-btn" id="weibo-theme-btn" title="主题设置">🌈</span>
+            <span class="action-btn" id="weibo-theme-btn" title="主题设置">⚙️</span>
             <span class="action-btn" id="post-weibo-btn">+</span>
         </div>
     </div>
@@ -2496,6 +2732,19 @@ body[data-theme="cute"] {
             </div>
         </div>
         
+        <div style="margin-top: 30px; background-color: #f9f9f9; padding: 20px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <h3 style="text-align: center; margin-bottom: 15px;">显示模式设置</h3>
+            <div class="form-group">
+                <label class="borderless-mode-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 15px; background-color: white; border-radius: 10px; border: 2px solid #e0e0e0; transition: all 0.3s ease;">
+                    <input type="checkbox" id="borderless-mode-toggle" style="width: 20px; height: 20px; cursor: pointer;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 16px; color: #333; margin-bottom: 5px;">无边框模式</div>
+                        <div style="font-size: 14px; color: #666; line-height: 1.4;">开启后手机将去掉外壳框架，屏幕大小跟随浏览器窗口自适应，适合不同设备和屏幕尺寸</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
         <div style="margin-top: 30px; background-color: #f9f9f9; padding: 20px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
             <h3 style="text-align: center; margin-bottom: 15px;">自定义壁纸</h3>
             <div id="wallpaper-preview" style="border: 2px dashed #ddd;">点击下方上传</div>
@@ -2909,20 +3158,44 @@ body[data-theme="cute"] {
         <span id="concurrent-status-text">正在处理 0 个请求</span>
     </div>
 
-    <!-- 社交主页弹窗 -->
-    <div id="social-profile-modal">
-        <div class="social-profile-content">
-            <button class="social-profile-close" onclick="closeSocialProfile()">×</button>
+    <!-- 社交主页模态弹窗 -->
+    <div id="social-profile-modal" class="social-profile-overlay">
+        <div class="social-profile-modal">
+            <div class="social-profile-content">
+            <!-- 顶部导航栏 -->
             <div class="social-profile-header">
+                <button class="social-profile-back" onclick="closeSocialProfile()">‹</button>
+                <div class="social-profile-title">个人主页</div>
                 <button class="social-profile-edit-btn" onclick="editSocialProfile()">编辑</button>
-                <img id="social-profile-avatar" class="social-profile-avatar" src="">
-                <div id="social-profile-name" class="social-profile-name"></div>
-                <div id="social-profile-signature" class="social-profile-signature"></div>
             </div>
-            <div class="social-profile-posts">
-                <div class="social-profile-posts-title">最近动态</div>
-                <div id="social-profile-posts-list"></div>
+
+            <!-- 用户信息区域 -->
+            <div class="social-profile-user-section">
+                <div class="social-profile-bg">
+                    <img id="social-profile-avatar" class="social-profile-avatar" src="">
+                    <div class="social-profile-user-info">
+                        <div id="social-profile-name" class="social-profile-name"></div>
+                        <div id="social-profile-signature" class="social-profile-signature"></div>
+                        <div class="social-profile-stats">
+                            <span id="social-profile-followers" class="social-profile-stat">0 粉丝</span>
+                            <span id="social-profile-following" class="social-profile-stat">0 关注</span>
+                            <span id="social-profile-posts-count" class="social-profile-stat">0 微博</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- 标签页 -->
+            <div class="social-profile-tabs">
+                <div class="social-profile-tab active" data-tab="posts">动态</div>
+                <div class="social-profile-tab" data-tab="photos">相册</div>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="social-profile-tab-content">
+                <div id="social-profile-posts-list" class="social-profile-posts-list"></div>
+            </div>
+        </div>
         </div>
     </div>
 
@@ -3360,7 +3633,7 @@ body[data-theme="cute"] {
     chats: '&id, isGroup',
     apiConfig: '&id',
     globalSettings: '&id',
-    userStickers: '&id, url, name', 
+    userStickers: '&id, url, name',
     worldBooks: '&id, name',
     musicLibrary: '&id',
     personaPresets: '&id',
@@ -3369,6 +3642,21 @@ body[data-theme="cute"] {
     weiboComments: '&id, postId, authorId, timestamp',
     weiboLikes: '[postId+authorId], postId, authorId',
     weiboReposts: '&id, originalPostId, authorId, timestamp'
+});
+        db.version(11).stores({
+    chats: '&id, isGroup',
+    apiConfig: '&id',
+    globalSettings: '&id',
+    userStickers: '&id, url, name',
+    worldBooks: '&id, name',
+    musicLibrary: '&id',
+    personaPresets: '&id',
+    weiboPosts: '&id, authorId, timestamp, visibility',
+    weiboComments: '&id, postId, authorId, timestamp',
+    weiboLikes: '[postId+authorId], postId, authorId',
+    weiboReposts: '&id, originalPostId, authorId, timestamp',
+    // 新增微博设置表
+    weiboSettings: '&id'
 });
 
         let state = { chats: {}, activeChatId: null, globalSettings: { iconPosition: 'center' }, apiConfig: {}, userStickers: [], worldBooks: [], personaPresets: [] };
@@ -3407,7 +3695,23 @@ body[data-theme="cute"] {
         let alertFlags = { hasShown40: false, hasShown20: false, hasShown10: false };
         let batteryAlertTimeout;
 
-        async function loadAllDataFromDB() { const [chatsArr, apiConfig, globalSettings, userStickers, worldBooks, musicLib, personaPresets] = await Promise.all([ db.chats.toArray(), db.apiConfig.get('main'), db.globalSettings.get('main'), db.userStickers.toArray(), db.worldBooks.toArray(), db.musicLibrary.get('main'), db.personaPresets.toArray() ]); state.chats = chatsArr.reduce((acc, chat) => { if (!chat.musicData) chat.musicData = { totalTime: 0 }; if (chat.settings && chat.settings.linkedWorldBookId && !chat.settings.linkedWorldBookIds) { chat.settings.linkedWorldBookIds = [chat.settings.linkedWorldBookId]; delete chat.settings.linkedWorldBookId; } acc[chat.id] = chat; return acc; }, {}); state.apiConfig = apiConfig || { id: 'main', proxyUrl: '', apiKey: '', model: '', temperature: 0.75 }; state.globalSettings = globalSettings || { id: 'main', wallpaper: 'linear-gradient(135deg, #89f7fe, #66a6ff)', iconPosition: 'center', fontSize: 'medium' }; state.userStickers = userStickers || []; state.worldBooks = worldBooks || []; musicState.playlist = musicLib?.playlist || []; state.personaPresets = personaPresets || []; applyIconPosition(); applyCustomIcons(); applyFontSize(); }
+        // 提前定义applyBorderlessMode函数
+        function applyBorderlessMode() {
+            const borderlessMode = state.globalSettings.borderlessMode || false;
+            if (borderlessMode) {
+                document.body.classList.add('borderless-mode');
+            } else {
+                document.body.classList.remove('borderless-mode');
+            }
+
+            // 更新壁纸设置界面的开关状态
+            const toggle = document.getElementById('borderless-mode-toggle');
+            if (toggle) {
+                toggle.checked = borderlessMode;
+            }
+        }
+
+        async function loadAllDataFromDB() { const [chatsArr, apiConfig, globalSettings, userStickers, worldBooks, musicLib, personaPresets] = await Promise.all([ db.chats.toArray(), db.apiConfig.get('main'), db.globalSettings.get('main'), db.userStickers.toArray(), db.worldBooks.toArray(), db.musicLibrary.get('main'), db.personaPresets.toArray() ]); state.chats = chatsArr.reduce((acc, chat) => { if (!chat.musicData) chat.musicData = { totalTime: 0 }; if (chat.settings && chat.settings.linkedWorldBookId && !chat.settings.linkedWorldBookIds) { chat.settings.linkedWorldBookIds = [chat.settings.linkedWorldBookId]; delete chat.settings.linkedWorldBookId; } acc[chat.id] = chat; return acc; }, {}); state.apiConfig = apiConfig || { id: 'main', proxyUrl: '', apiKey: '', model: '', temperature: 0.75 }; state.globalSettings = globalSettings || { id: 'main', wallpaper: 'linear-gradient(135deg, #89f7fe, #66a6ff)', iconPosition: 'center', fontSize: 'medium', borderlessMode: false }; state.userStickers = userStickers || []; state.worldBooks = worldBooks || []; musicState.playlist = musicLib?.playlist || []; state.personaPresets = personaPresets || []; applyIconPosition(); applyCustomIcons(); applyFontSize(); applyBorderlessMode(); }
         async function saveGlobalPlaylist() { await db.musicLibrary.put({ id: 'main', playlist: musicState.playlist }); }
 
         const modalOverlay = document.getElementById('custom-modal-overlay');
@@ -3905,7 +4209,77 @@ body[data-theme="cute"] {
             }
         }
         function updateClock() { const now = new Date(); const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); const dateString = now.toLocaleDateString('zh-CN', { weekday: 'long', month: 'long', day: 'numeric' }); document.getElementById('main-time').textContent = timeString; document.getElementById('status-bar-time').textContent = timeString; document.getElementById('main-date').textContent = dateString; }
-        function parseAiResponse(content) { try { const parsed = JSON.parse(content); if (Array.isArray(parsed)) return parsed; } catch (e) {} try { const match = content.match(/\[(.*?)\]/s); if (match && match[0]) { const parsed = JSON.parse(match[0]); if (Array.isArray(parsed)) return parsed; } } catch (e) {} const lines = content.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('```')); if (lines.length > 0) return lines; return [content]; }
+        function parseAiResponse(content) {
+            // 首先尝试解析JSON数组格式
+            try {
+                const parsed = JSON.parse(content);
+                if (Array.isArray(parsed)) return parsed;
+            } catch (e) {}
+
+            // 尝试提取JSON数组部分
+            try {
+                const match = content.match(/\[(.*?)\]/s);
+                if (match && match[0]) {
+                    const parsed = JSON.parse(match[0]);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            } catch (e) {}
+
+            // 检查是否包含JSON对象格式的消息
+            if (content.includes('"content"') && content.includes('"name"')) {
+                try {
+                    // 尝试解析单个JSON对象
+                    const parsed = JSON.parse(content);
+                    if (parsed.content) return [parsed];
+                } catch (e) {
+                    // 尝试提取多个JSON对象
+                    const jsonObjects = content.match(/\{[^{}]*"content"[^{}]*\}/g);
+                    if (jsonObjects) {
+                        const messages = [];
+                        for (const jsonStr of jsonObjects) {
+                            try {
+                                const obj = JSON.parse(jsonStr);
+                                if (obj.content) messages.push(obj);
+                            } catch (e) {}
+                        }
+                        if (messages.length > 0) return messages;
+                    }
+                }
+            }
+
+            // 按行分割，过滤空行和代码块标记
+            const lines = content.split('\n')
+                .map(l => l.trim())
+                .filter(l => l.length > 0 && !l.startsWith('```') && !l.startsWith('json'));
+
+            // 如果有多行，返回分割后的行
+            if (lines.length > 1) {
+                return lines;
+            }
+
+            // 尝试按句号分割长消息
+            if (content.length > 100) {
+                const sentences = content.split(/[。！？.!?]/)
+                    .map(s => s.trim())
+                    .filter(s => s.length > 0);
+
+                if (sentences.length > 1) {
+                    // 重新添加标点符号
+                    const punctuations = content.match(/[。！？.!?]/g) || [];
+                    const result = [];
+                    for (let i = 0; i < sentences.length; i++) {
+                        if (sentences[i]) {
+                            const punct = punctuations[i] || '';
+                            result.push(sentences[i] + punct);
+                        }
+                    }
+                    return result.filter(s => s.trim().length > 0);
+                }
+            }
+
+            // 默认返回原内容
+            return [content];
+        }
         function renderApiSettings() { 
     document.getElementById('proxy-url').value = state.apiConfig.proxyUrl || ''; 
     document.getElementById('api-key').value = state.apiConfig.apiKey || '';
@@ -6675,29 +7049,35 @@ async function deleteSelectedWeiboPosts() {
         function prependLoadMoreButton(container) { const button = document.createElement('button'); button.id = 'load-more-btn'; button.textContent = '加载更早的记录'; button.addEventListener('click', loadMoreMessages); container.prepend(button); }
         function loadMoreMessages() { const messagesContainer = document.getElementById('chat-messages'); const chat = state.chats[state.activeChatId]; if (!chat) return; const loadMoreBtn = document.getElementById('load-more-btn'); if (loadMoreBtn) loadMoreBtn.remove(); const totalMessages = chat.history.length; const nextSliceStart = totalMessages - currentRenderedCount - MESSAGE_RENDER_WINDOW; const nextSliceEnd = totalMessages - currentRenderedCount; const messagesToPrepend = chat.history.slice(Math.max(0, nextSliceStart), nextSliceEnd); const oldScrollHeight = messagesContainer.scrollHeight; messagesToPrepend.reverse().forEach(msg => prependMessage(msg, chat)); currentRenderedCount += messagesToPrepend.length; const newScrollHeight = messagesContainer.scrollHeight; messagesContainer.scrollTop += (newScrollHeight - oldScrollHeight); if (totalMessages > currentRenderedCount) { prependLoadMoreButton(messagesContainer); } }
         
-        function renderWallpaperScreen() { 
-            const preview = document.getElementById('wallpaper-preview'); 
-            const bg = newWallpaperBase64 || state.globalSettings.wallpaper; 
-            if (bg && bg.startsWith('data:image')) { 
-                preview.style.backgroundImage = `url(${bg})`; 
-                preview.textContent = ''; 
-            } else if(bg) { 
-                preview.style.backgroundImage = bg; 
-                preview.textContent = '当前为渐变色'; 
+        function renderWallpaperScreen() {
+            const preview = document.getElementById('wallpaper-preview');
+            const bg = newWallpaperBase64 || state.globalSettings.wallpaper;
+            if (bg && bg.startsWith('data:image')) {
+                preview.style.backgroundImage = `url(${bg})`;
+                preview.textContent = '';
+            } else if(bg) {
+                preview.style.backgroundImage = bg;
+                preview.textContent = '当前为渐变色';
             }
-            
+
             // 设置图标位置选择器的当前值
             const iconPositionSelect = document.getElementById('icon-position');
             if (iconPositionSelect) {
                 iconPositionSelect.value = state.globalSettings.iconPosition || 'center';
             }
-            
+
             // 设置字号选择器的当前值
             const fontSizeSelect = document.getElementById('font-size-select');
             if (fontSizeSelect) {
                 fontSizeSelect.value = state.globalSettings.fontSize || 'medium';
             }
-            
+
+            // 设置无边框模式开关的当前值
+            const borderlessToggle = document.getElementById('borderless-mode-toggle');
+            if (borderlessToggle) {
+                borderlessToggle.checked = state.globalSettings.borderlessMode || false;
+            }
+
             // 渲染自定义图标网格
             renderCustomIconsGrid();
         }
@@ -6834,13 +7214,14 @@ async function deleteSelectedWeiboPosts() {
         
         function applyFontSize() {
             const fontSize = state.globalSettings.fontSize || 'medium';
-            
+
             // 移除之前的字号设置
             document.body.removeAttribute('data-font-size');
-            
+
             // 应用新的字号设置
             document.body.setAttribute('data-font-size', fontSize);
         }
+
         function renderWorldBookScreen() { const listEl = document.getElementById('world-book-list'); listEl.innerHTML = ''; if (state.worldBooks.length === 0) { listEl.innerHTML = '<p style="text-align:center; color: #8a8a8a; margin-top: 50px;">点击右上角 "+" 创建你的第一本世界书</p>'; return; } state.worldBooks.forEach(book => { const item = document.createElement('div'); item.className = 'list-item'; item.dataset.bookId = book.id; item.innerHTML = `<div class="item-title">${book.name}</div><div class="item-content">${(book.content || '暂无内容...').substring(0, 50)}</div>`; item.addEventListener('click', () => openWorldBookEditor(book.id)); addLongPressListener(item, async () => { const confirmed = await showCustomConfirm('删除世界书', `确定要删除《${book.name}》吗？此操作不可撤销。`, { confirmButtonClass: 'btn-danger' }); if (confirmed) { await db.worldBooks.delete(book.id); state.worldBooks = state.worldBooks.filter(wb => wb.id !== book.id); renderWorldBookScreen(); } }); listEl.appendChild(item); }); }
         window.renderWorldBookScreenProxy = renderWorldBookScreen;
         function openWorldBookEditor(bookId) { editingWorldBookId = bookId; const book = state.worldBooks.find(wb => wb.id === bookId); if (!book) return; document.getElementById('world-book-editor-title').textContent = book.name; document.getElementById('world-book-name-input').value = book.name; document.getElementById('world-book-content-input').value = book.content; showScreen('world-book-editor-screen'); }
@@ -7875,9 +8256,38 @@ async function deleteSelectedWeiboPosts() {
                     } else {
                         continue;
                     }
-                } else { 
-                    aiMessage = { role: 'assistant', content: String(msgData), timestamp: Date.now() }; 
-                } chat.history.push(aiMessage); await db.chats.put(chat); if (isViewingThisChat) { appendMessage(aiMessage, chat); await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 300)); } if (!isViewingThisChat && !notificationShown) { let notificationText; if(aiMessage.type === 'transfer') notificationText = `[收到一笔转账]`; else if(aiMessage.type === 'ai_image') notificationText = `[图片]`; else if(aiMessage.type === 'voice_message') notificationText = `[语音]`; else notificationText = STICKER_REGEX.test(aiMessage.content) ? '[表情]' : String(aiMessage.content); const finalNotifText = chat.isGroup ? `${aiMessage.senderName}: ${notificationText}` : notificationText; showNotification(chatId, finalNotifText); notificationShown = true; } } } catch (error) { const errorContent = `[出错了: ${error.message}]`; const errorMessage = { role: 'assistant', content: errorContent, timestamp: Date.now() }; chat.history.push(errorMessage); await db.chats.put(chat); appendMessage(errorMessage, chat); } finally { document.getElementById('typing-indicator').style.display = 'none'; renderChatList(); } }
+                } else {
+                    aiMessage = { role: 'assistant', content: String(msgData), timestamp: Date.now() };
+                }
+
+                // 保存消息到历史记录
+                chat.history.push(aiMessage);
+                await db.chats.put(chat);
+
+                // 如果正在查看此聊天，显示消息
+                if (isViewingThisChat) {
+                    appendMessage(aiMessage, chat);
+                    // 为每条消息添加延迟，模拟真实的发送间隔
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 1200 + 800));
+                }
+
+                // 如果不在查看此聊天且还没显示通知，显示通知
+                if (!isViewingThisChat && !notificationShown) {
+                    let notificationText;
+                    if(aiMessage.type === 'transfer') {
+                        notificationText = `[收到一笔转账]`;
+                    } else if(aiMessage.type === 'ai_image') {
+                        notificationText = `[图片]`;
+                    } else if(aiMessage.type === 'voice_message') {
+                        notificationText = `[语音]`;
+                    } else {
+                        notificationText = STICKER_REGEX.test(aiMessage.content) ? '[表情]' : String(aiMessage.content);
+                    }
+
+                    const finalNotifText = chat.isGroup ? `${aiMessage.senderName}: ${notificationText}` : notificationText;
+                    showNotification(chatId, finalNotifText);
+                    notificationShown = true;
+                } } } catch (error) { const errorContent = `[出错了: ${error.message}]`; const errorMessage = { role: 'assistant', content: errorContent, timestamp: Date.now() }; chat.history.push(errorMessage); await db.chats.put(chat); appendMessage(errorMessage, chat); } finally { document.getElementById('typing-indicator').style.display = 'none'; renderChatList(); } }
         async function sendSticker(sticker) { 
             if (!state.activeChatId) return; 
             const chat = state.chats[state.activeChatId]; 
@@ -8363,11 +8773,11 @@ async function deleteSelectedWeiboPosts() {
                 addCallToHistory();
             }
             
-            // AI对被挂断做出反应
-            setTimeout(() => {
-                generateCallReaction('hungup');
-            }, Math.random() * 2000 + 1000);
-            
+            // 保存当前状态用于生成反应
+            const currentChatId = callState.activeChatId;
+            const currentCallType = callState.callType;
+            const currentMessages = [...callState.messages];
+
             // 重置状态
             callState = {
                 isInCall: false,
@@ -8378,6 +8788,11 @@ async function deleteSelectedWeiboPosts() {
                 messages: [],
                 userInitiated: false
             };
+
+            // AI对被挂断做出反应（使用保存的状态）
+            setTimeout(() => {
+                generateCallReaction('hungup', currentChatId, currentCallType, currentMessages);
+            }, Math.random() * 2000 + 1000);
         }
         
         async function addCallToHistory() {
@@ -8865,23 +9280,25 @@ ${sceneInstructions}
         }
         
         // 生成AI对通话状态的反应
-        async function generateCallReaction(action) {
-            if (!state.activeChatId) return;
-            
-            const chat = state.chats[state.activeChatId];
+        async function generateCallReaction(action, chatId = null, callType = null, callMessages = []) {
+            // 使用传入的chatId或当前活跃的chatId
+            const targetChatId = chatId || state.activeChatId;
+            if (!targetChatId) return;
+
+            const chat = state.chats[targetChatId];
             if (!chat || chat.isGroup) return;
-            
+
             // 只对被挂断做出反应
             if (action !== 'hungup') return;
-            
+
             const { proxyUrl, apiKey, model } = state.apiConfig;
             if (!proxyUrl || !apiKey || !model) return;
-            
+
             try {
                 // 获取上下文记忆
                 const maxMemory = parseInt(chat.settings.maxMemory) || 10;
                 const recentHistory = getHistoryByRounds(chat.history, maxMemory);
-                
+
                 // 获取世界书内容
                 let worldBookContent = '';
                 if (chat.settings.linkedWorldBookIds && chat.settings.linkedWorldBookIds.length > 0) {
@@ -8893,16 +9310,16 @@ ${sceneInstructions}
                         worldBookContent = `\n\n# 核心世界观设定 (必须严格遵守以下所有设定)\n${linkedContents}\n`;
                     }
                 }
-                
+
                 // 获取本次通话的内容总结
-                const callSummary = callState.messages.length > 0 ? 
-                    callState.messages.map(msg => `${msg.role === 'user' ? '用户' : chat.name}: ${msg.content}`).join('\n') :
+                const callSummary = callMessages.length > 0 ?
+                    callMessages.map(msg => `${msg.role === 'user' ? '用户' : chat.name}: ${msg.content}`).join('\n') :
                     '刚才进行了一次简短的通话';
                 
                 const systemPrompt = `你是${chat.name}，你的人设：${chat.settings.aiPersona}${worldBookContent}
 
 # 重要情境说明：
-- 你刚刚和用户进行了一次${callState.callType === 'video' ? '视频' : '语音'}通话
+- 你刚刚和用户进行了一次${callType === 'video' ? '视频' : '语音'}通话
 - 现在通话已经结束/被挂断了
 - 你们现在回到了正常的手机聊天模式（发送文字消息）
 - 这不再是通话，而是普通的聊天对话
@@ -8975,7 +9392,7 @@ JSON输出格式示例:
                         await db.chats.put(chat);
                         
                         // 如果当前正在查看这个聊天，添加消息
-                        if (state.activeChatId === chat.id && document.getElementById('chat-interface-screen').classList.contains('active')) {
+                        if (state.activeChatId === targetChatId && document.getElementById('chat-interface-screen').classList.contains('active')) {
                             appendMessage(aiMessage, chat);
                         }
                         
@@ -9097,7 +9514,8 @@ JSON输出格式示例:
             updateClock(); setInterval(updateClock, 1000 * 30);
             applyGlobalWallpaper();
             applyIconPosition();
-            initBatteryManager(); 
+            applyBorderlessMode();
+            initBatteryManager();
             
             document.getElementById('back-to-list-btn').addEventListener('click', () => { exitSelectionMode(); state.activeChatId = null; showScreen('chat-list-screen'); });
             document.getElementById('add-chat-btn').addEventListener('click', async () => { const name = await showCustomPrompt('创建新聊天', '请输入Ta的名字'); if (name && name.trim()) { const newChatId = 'chat_' + Date.now(); const newChat = { id: newChatId, name: name.trim(), isGroup: false, settings: { aiPersona: '你是谁呀。', myPersona: '我是谁呀。', maxMemory: 10, aiAvatar: defaultAvatar, myAvatar: defaultAvatar, background: '', theme: 'default', linkedWorldBookIds: [], aiCallEnabled: true }, history: [], musicData: { totalTime: 0 } }; state.chats[newChatId] = newChat; await db.chats.put(newChat); renderChatList(); } });
@@ -9371,6 +9789,15 @@ document.getElementById('regenerate-btn').addEventListener('click', async () => 
                 await db.globalSettings.put(state.globalSettings);
                 applyFontSize();
                 showToast('字号设置已保存并应用！', 'success');
+            });
+
+            // 无边框模式开关事件监听器
+            document.getElementById('borderless-mode-toggle').addEventListener('change', async (event) => {
+                const borderlessMode = event.target.checked;
+                state.globalSettings.borderlessMode = borderlessMode;
+                await db.globalSettings.put(state.globalSettings);
+                applyBorderlessMode();
+                showToast(borderlessMode ? '无边框模式已开启！' : '无边框模式已关闭！', 'success');
             });
             
             // 自定义图标事件监听器
@@ -10145,44 +10572,95 @@ document.getElementById('regenerate-btn').addEventListener('click', async () => 
             });
 
             // 微博主题设置事件监听
-            document.getElementById('weibo-theme-btn').addEventListener('click', () => {
+            document.getElementById('weibo-theme-btn').addEventListener('click', async () => {
                 // 显示主题设置弹窗
                 document.getElementById('weibo-theme-modal').classList.add('visible');
-                
+
+                // 从数据库加载保存的微博设置
+                let weiboSettings = null;
+                try {
+                    weiboSettings = await db.weiboSettings.get('main');
+                } catch (error) {
+                    console.log('加载微博设置失败，使用默认设置');
+                }
+
                 // 初始化透明度滑块的值
-                const savedOpacity = localStorage.getItem('weibo_card_opacity') || 1.0;
+                const savedOpacity = weiboSettings?.cardOpacity || 1.0;
                 const opacitySlider = document.getElementById('card-opacity-slider');
                 const opacityValue = document.getElementById('card-opacity-value');
                 opacitySlider.value = savedOpacity;
                 opacityValue.textContent = savedOpacity;
+
+                // 恢复保存的主题选择
+                const savedTheme = weiboSettings?.theme || 'white';
+                document.querySelectorAll('#weibo-theme-modal .theme-dot').forEach(dot => {
+                    dot.classList.remove('active');
+                });
+                const savedThemeDot = document.querySelector(`#weibo-theme-modal .theme-dot[data-theme="${savedTheme}"]`);
+                if (savedThemeDot) {
+                    savedThemeDot.classList.add('active');
+                }
+
+                // 恢复保存的背景图片预览
+                const savedBackground = weiboSettings?.backgroundImage;
+                const bgPreview = document.getElementById('weibo-bg-preview');
+                if (savedBackground) {
+                    bgPreview.style.backgroundImage = `url(${savedBackground})`;
+                    bgPreview.textContent = '';
+                    document.getElementById('remove-weibo-bg-btn').style.display = 'inline-block';
+                } else {
+                    bgPreview.style.backgroundImage = 'none';
+                    bgPreview.textContent = '点击下方上传背景图片';
+                    document.getElementById('remove-weibo-bg-btn').style.display = 'none';
+                }
             });
 
             document.querySelector('#weibo-theme-modal .cancel').addEventListener('click', () => {
                 document.getElementById('weibo-theme-modal').classList.remove('visible');
             });
 
-            document.querySelector('#weibo-theme-modal .save').addEventListener('click', () => {
+            document.querySelector('#weibo-theme-modal .save').addEventListener('click', async () => {
                 // 应用主题设置
                 const activeTheme = document.querySelector('#weibo-theme-modal .theme-dot.active');
+                let theme = 'white';
                 if (activeTheme) {
-                    const theme = activeTheme.dataset.theme;
+                    theme = activeTheme.dataset.theme;
                     document.body.setAttribute('data-weibo-theme', theme);
                 }
-                
+
                 // 应用背景设置
                 const bgPreview = document.getElementById('weibo-bg-preview');
                 const bgImage = bgPreview.style.backgroundImage;
+                let backgroundImage = null;
                 if (bgImage && bgImage !== 'none') {
                     document.getElementById('weibo-screen').style.backgroundImage = bgImage;
                     document.getElementById('weibo-screen').style.backgroundSize = 'cover';
                     document.getElementById('weibo-screen').style.backgroundPosition = 'center';
+                    backgroundImage = bgImage.slice(5, -2); // 移除 url("...") 包装
+                } else {
+                    document.getElementById('weibo-screen').style.backgroundImage = 'none';
                 }
-                
+
                 // 应用动态卡片透明度设置
                 const opacity = document.getElementById('card-opacity-slider').value;
-                localStorage.setItem('weibo_card_opacity', opacity);
                 applyWeiboCardOpacity(opacity);
-                
+
+                // 保存所有设置到Dexie数据库
+                const weiboSettings = {
+                    id: 'main',
+                    theme: theme,
+                    backgroundImage: backgroundImage,
+                    cardOpacity: opacity
+                };
+
+                try {
+                    await db.weiboSettings.put(weiboSettings);
+                    showToast('微博主题设置已保存！', 'success');
+                } catch (error) {
+                    console.error('保存微博设置失败:', error);
+                    showToast('保存失败，请重试', 'error');
+                }
+
                 document.getElementById('weibo-theme-modal').classList.remove('visible');
             });
 
@@ -10206,6 +10684,8 @@ document.getElementById('regenerate-btn').addEventListener('click', async () => 
                 bgPreview.style.backgroundImage = 'none';
                 bgPreview.textContent = '点击下方上传背景图片';
                 document.getElementById('remove-weibo-bg-btn').style.display = 'none';
+                // 清除文件输入
+                document.getElementById('weibo-bg-upload-input').value = '';
             });
 
             // 用户资料卡事件监听
@@ -10601,6 +11081,38 @@ document.getElementById('regenerate-btn').addEventListener('click', async () => 
             });
         }
         init();
+
+        // 应用保存的微博设置
+        async function applyWeiboSettings() {
+            // 从数据库加载保存的微博设置
+            let weiboSettings = null;
+            try {
+                weiboSettings = await db.weiboSettings.get('main');
+            } catch (error) {
+                console.log('加载微博设置失败，使用默认设置');
+            }
+
+            // 应用主题设置
+            const savedTheme = weiboSettings?.theme || 'white';
+            document.body.setAttribute('data-weibo-theme', savedTheme);
+
+            // 应用保存的背景图片
+            const savedBackground = weiboSettings?.backgroundImage;
+            if (savedBackground) {
+                const weiboScreen = document.getElementById('weibo-screen');
+                if (weiboScreen) {
+                    weiboScreen.style.backgroundImage = `url(${savedBackground})`;
+                    weiboScreen.style.backgroundSize = 'cover';
+                    weiboScreen.style.backgroundPosition = 'center';
+                }
+            }
+
+            // 应用保存的透明度设置
+            const savedOpacity = weiboSettings?.cardOpacity || 1.0;
+            applyWeiboCardOpacity(savedOpacity);
+        }
+
+        applyWeiboSettings();
         // 数据表结构 - 完整备份所需的所有数据
 const fullBackupStores = {
     chats: '&id, isGroup',
@@ -10715,36 +11227,7 @@ function applyWeiboCardOpacity(opacity) {
     document.documentElement.style.setProperty('--weibo-card-opacity', opacity);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 设置默认主题为白色
-    const defaultTheme = 'white';
-    document.body.setAttribute('data-weibo-theme', defaultTheme);
-    
-    // 为默认主题点添加active类
-    const defaultThemeDot = document.querySelector(`[data-theme="${defaultTheme}"]`);
-    if (defaultThemeDot) {
-        defaultThemeDot.classList.add('active');
-    }
-    
-    // 初始化透明度滑块
-    const opacitySlider = document.getElementById('card-opacity-slider');
-    const opacityValue = document.getElementById('card-opacity-value');
-    
-    // 从本地存储加载保存的透明度设置
-    const savedOpacity = localStorage.getItem('weibo_card_opacity') || 1.0;
-    opacitySlider.value = savedOpacity;
-    opacityValue.textContent = savedOpacity;
-    
-    // 应用保存的透明度
-    applyWeiboCardOpacity(savedOpacity);
-    
-    // 添加透明度滑块的事件监听
-    opacitySlider.addEventListener('input', function() {
-        const value = this.value;
-        opacityValue.textContent = value;
-        applyWeiboCardOpacity(value);
-    });
-});
+
 
             // 使用事件委托处理动态添加的时间点按钮
             document.addEventListener('click', (e) => {
@@ -10784,6 +11267,293 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 页面加载时初始化用户资料
         initUserProfile();
+
+        // 社交主页相关函数
+        function showSocialProfileSafe(authorId) {
+            try {
+                showSocialProfile(authorId);
+            } catch (error) {
+                console.error('显示社交主页失败:', error);
+                showToast('无法显示社交主页', 'error');
+            }
+        }
+
+        async function showSocialProfile(authorId) {
+            const modal = document.getElementById('social-profile-modal');
+            const avatar = document.getElementById('social-profile-avatar');
+            const name = document.getElementById('social-profile-name');
+            const signature = document.getElementById('social-profile-signature');
+            const followersEl = document.getElementById('social-profile-followers');
+            const followingEl = document.getElementById('social-profile-following');
+            const postsCountEl = document.getElementById('social-profile-posts-count');
+            const postsList = document.getElementById('social-profile-posts-list');
+
+            let profile;
+            let posts = [];
+
+            if (authorId === 'user') {
+                // 用户资料
+                const savedProfile = localStorage.getItem('weibo_user_profile');
+                profile = savedProfile ? JSON.parse(savedProfile) : {
+                    name: '我的微博',
+                    signature: '分享生活中的美好瞬间',
+                    avatar: 'https://i.postimg.cc/PxZrFFFL/o-o-1.jpg'
+                };
+
+                // 获取用户的微博
+                posts = await db.weiboPosts
+                    .where('authorId')
+                    .equals('user')
+                    .reverse()
+                    .sortBy('timestamp');
+
+            } else {
+                // AI角色资料
+                const chat = state.chats[authorId];
+                if (!chat) {
+                    showToast('角色信息不存在', 'error');
+                    return;
+                }
+
+                profile = {
+                    name: chat.name,
+                    signature: chat.settings.aiSignature || '这个人很懒，什么都没留下',
+                    avatar: chat.settings.aiAvatar || 'https://i.postimg.cc/PxZrFFFL/o-o-1.jpg'
+                };
+
+                // 获取AI的微博
+                posts = await db.weiboPosts
+                    .where('authorId')
+                    .equals(authorId)
+                    .reverse()
+                    .sortBy('timestamp');
+            }
+
+            // 设置社交主页背景
+            const socialBg = modal.querySelector('.social-profile-bg');
+            if (authorId === 'user') {
+                const userProfile = JSON.parse(localStorage.getItem('weibo_user_profile') || '{}');
+                if (userProfile.socialBackground) {
+                    socialBg.style.backgroundImage = `url(${userProfile.socialBackground})`;
+                } else {
+                    socialBg.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }
+            } else {
+                const chat = state.chats[authorId];
+                if (chat && chat.settings.socialBackground) {
+                    socialBg.style.backgroundImage = `url(${chat.settings.socialBackground})`;
+                } else {
+                    socialBg.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }
+            }
+
+            // 填充资料信息
+            avatar.src = profile.avatar;
+            name.textContent = profile.name;
+            signature.textContent = profile.signature;
+
+            // 生成合理的粉丝和关注数
+            const postsCount = posts.length;
+            let followersCount, followingCount;
+
+            if (authorId === 'user') {
+                // 用户的粉丝数 - 根据人设"小夜"，应该有一定粉丝基础
+                const baseFollowers = 150 + Math.floor(Math.random() * 200); // 150-350基础粉丝
+                followersCount = Math.max(baseFollowers, Math.floor(postsCount * (8 + Math.random() * 15))); // 每条微博带来8-23个粉丝
+                followingCount = Math.max(50, Math.floor(postsCount * (2 + Math.random() * 4))); // 关注数相对较少
+            } else {
+                // AI角色可能有更多粉丝
+                const baseFollowers = 300 + Math.floor(Math.random() * 500); // 300-800基础粉丝
+                followersCount = Math.max(baseFollowers, Math.floor(postsCount * (15 + Math.random() * 25))); // 每条微博带来15-40个粉丝
+                followingCount = Math.max(30, Math.floor(postsCount * (1 + Math.random() * 3))); // 关注数较少
+            }
+
+            // 更新统计信息
+            followersEl.textContent = `${followersCount} 粉丝`;
+            followingEl.textContent = `${followingCount} 关注`;
+            postsCountEl.textContent = `${postsCount} 微博`;
+
+            // 填充最近动态
+            postsList.innerHTML = '';
+            if (posts.length === 0) {
+                postsList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">暂无动态</div>';
+            } else {
+                posts.slice(0, 10).forEach(post => {
+                    const postItem = document.createElement('div');
+                    postItem.className = 'social-profile-post-item';
+
+                    const postContent = document.createElement('div');
+                    postContent.className = 'social-profile-post-content';
+                    postContent.textContent = post.content;
+
+                    const postTime = document.createElement('div');
+                    postTime.className = 'social-profile-post-time';
+                    postTime.textContent = new Date(post.timestamp).toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    });
+
+                    postItem.appendChild(postContent);
+                    postItem.appendChild(postTime);
+                    postsList.appendChild(postItem);
+                });
+            }
+
+            // 存储当前查看的用户ID，供编辑功能使用
+            modal.dataset.currentAuthorId = authorId;
+            modal.dataset.posts = JSON.stringify(posts);
+
+            // 初始化标签页事件
+            initSocialProfileTabs(modal);
+
+            // 显示模态弹窗
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.style.opacity = '1';
+            }, 10);
+
+            // 添加点击背景关闭功能
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    closeSocialProfile();
+                }
+            };
+        }
+
+        function initSocialProfileTabs(modal) {
+            const tabs = modal.querySelectorAll('.social-profile-tab');
+            const postsList = modal.querySelector('#social-profile-posts-list');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // 添加当前active类
+                    tab.classList.add('active');
+
+                    const tabType = tab.dataset.tab;
+                    const posts = JSON.parse(modal.dataset.posts || '[]');
+
+                    if (tabType === 'posts') {
+                        // 显示动态
+                        showSocialProfilePosts(postsList, posts);
+                    } else if (tabType === 'photos') {
+                        // 显示相册
+                        showSocialProfilePhotos(postsList, posts);
+                    }
+                });
+            });
+        }
+
+        function showSocialProfilePosts(container, posts) {
+            container.innerHTML = '';
+            if (posts.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">暂无动态</div>';
+            } else {
+                posts.slice(0, 10).forEach(post => {
+                    const postItem = document.createElement('div');
+                    postItem.className = 'social-profile-post-item';
+
+                    const postContent = document.createElement('div');
+                    postContent.className = 'social-profile-post-content';
+                    postContent.textContent = post.content;
+
+                    const postTime = document.createElement('div');
+                    postTime.className = 'social-profile-post-time';
+                    postTime.textContent = new Date(post.timestamp).toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    });
+
+                    postItem.appendChild(postContent);
+                    postItem.appendChild(postTime);
+                    container.appendChild(postItem);
+                });
+            }
+        }
+
+        function showSocialProfilePhotos(container, posts) {
+            container.innerHTML = '';
+
+            // 提取所有包含图片的微博
+            const photoPosts = posts.filter(post => post.images && post.images.length > 0);
+
+            if (photoPosts.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">暂无图片</div>';
+            } else {
+                const photoGrid = document.createElement('div');
+                photoGrid.style.cssText = 'display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 10px;';
+
+                photoPosts.forEach(post => {
+                    post.images.forEach(imageUrl => {
+                        const photoItem = document.createElement('div');
+                        photoItem.style.cssText = 'aspect-ratio: 1; overflow: hidden; border-radius: 8px; cursor: pointer;';
+
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+                        img.onclick = () => showImageViewer(imageUrl);
+
+                        photoItem.appendChild(img);
+                        photoGrid.appendChild(photoItem);
+                    });
+                });
+
+                container.appendChild(photoGrid);
+            }
+        }
+
+        function closeSocialProfile() {
+            const modal = document.getElementById('social-profile-modal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function editSocialProfile() {
+            const modal = document.getElementById('social-profile-modal');
+            const authorId = modal.dataset.currentAuthorId;
+
+            closeSocialProfile();
+
+            if (authorId === 'user') {
+                // 打开用户资料编辑弹窗
+                document.getElementById('weibo-profile-modal').classList.add('visible');
+
+                // 加载当前用户资料到编辑表单
+                const savedProfile = localStorage.getItem('weibo_user_profile');
+                const profile = savedProfile ? JSON.parse(savedProfile) : {};
+
+                document.getElementById('profile-name-input').value = profile.name || '我的微博';
+                document.getElementById('profile-signature-input').value = profile.signature || '分享生活中的美好瞬间';
+                document.getElementById('profile-email-input').value = profile.email || '';
+                document.getElementById('profile-avatar-preview').src = profile.avatar || 'https://i.postimg.cc/PxZrFFFL/o-o-1.jpg';
+
+            } else {
+                // 打开AI资料编辑弹窗
+                const aiModal = document.getElementById('ai-profile-modal');
+                aiModal.dataset.aiId = authorId;
+                aiModal.classList.add('visible');
+
+                // 加载AI资料到编辑表单
+                const chat = state.chats[authorId];
+                if (chat) {
+                    document.getElementById('ai-profile-name-input').value = chat.name || '';
+                    document.getElementById('ai-profile-signature-input').value = chat.settings.aiSignature || '';
+                    document.getElementById('ai-profile-persona-input').value = chat.settings.aiPersona || '';
+                    document.getElementById('ai-profile-avatar-preview').src = chat.settings.aiAvatar || 'https://i.postimg.cc/PxZrFFFL/o-o-1.jpg';
+                }
+            }
+        }
+
+        // 将函数暴露到全局作用域
+        window.showSocialProfileSafe = showSocialProfileSafe;
+        window.showSocialProfile = showSocialProfile;
+        window.closeSocialProfile = closeSocialProfile;
+        window.editSocialProfile = editSocialProfile;
         
         // 添加测试API连接功能
         document.addEventListener('DOMContentLoaded', () => {
@@ -11066,7 +11836,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="config-detail-item">
                             <span class="config-detail-label">密钥:</span>
-                            <span class="config-detail-value" title="${config.apiKey}">●●●●●●${config.apiKey.slice(-6)}</span>
+                            <span class="config-detail-value" title="${config.apiKey}">●●●●●●${config.apiKey && config.apiKey.length >= 6 ? config.apiKey.slice(-6) : (config.apiKey || '未设置')}</span>
                         </div>
                         <div class="config-detail-item">
                             <span class="config-detail-label">模型:</span>
