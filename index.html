@@ -1176,7 +1176,7 @@ body[data-theme="cute"] {
             height: 100%;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: hidden; /* 保持外层不滚动 */
         }
 
         /* 顶部导航栏 */
@@ -1329,6 +1329,8 @@ body[data-theme="cute"] {
             flex: 1;
             overflow-y: auto;
             background: white;
+            min-height: 0; /* 确保flex子元素可以缩小 */
+            -webkit-overflow-scrolling: touch; /* iOS平滑滚动 */
         }
 
         .social-profile-posts-list {
