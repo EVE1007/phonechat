@@ -4859,8 +4859,16 @@ https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=s
         if (post.imageUrl) {
             // 确保图片正确显示，并添加可点击功能，点击显示图片描述
             if (post.imageDescription) {
+                // 正确转义图片描述，避免JavaScript语法错误
+                const escapedDescription = post.imageDescription
+                    .replace(/\\/g, '\\\\')  // 转义反斜杠
+                    .replace(/'/g, "\\'")    // 转义单引号
+                    .replace(/"/g, '\\"')    // 转义双引号
+                    .replace(/\n/g, '\\n')   // 转义换行符
+                    .replace(/\r/g, '\\r')   // 转义回车符
+                    .replace(/\t/g, '\\t');  // 转义制表符
                 contentHtml += `<div style="text-align:center;margin:10px 0;">
-                    <img src="${post.imageUrl}" alt="微博图片" style="max-width:100%;border-radius:10px;display:inline-block;cursor:pointer;" onclick="window.showCustomAlert && window.showCustomAlert('图片详情', '${post.imageDescription.replace(/'/g, "\\'")}')" />
+                    <img src="${post.imageUrl}" alt="微博图片" style="max-width:100%;border-radius:10px;display:inline-block;cursor:pointer;" onclick="window.showCustomAlert && window.showCustomAlert('图片详情', '${escapedDescription}')" />
                 </div>`;
             } else {
                 contentHtml += `<div style="text-align:center;margin:10px 0;">
@@ -7100,7 +7108,7 @@ async function generateAiResponse(ai, type, post, userContent = '', replyToUser 
             const stickerLine = lines.find(line => STICKER_REGEX.test(line.trim()));
 
             if (stickerLine && lines.length === 1) {
-                // 纯表情包回复
+                // 纯表情包回复 - 直接返回URL字符串，让微博评论渲染器处理
                 const stickerUrl = stickerLine.trim();
                 // 尝试从用户表情包中找到对应的名称
                 const userSticker = state.userStickers.find(s => s.url === stickerUrl);
@@ -7108,10 +7116,7 @@ async function generateAiResponse(ai, type, post, userContent = '', replyToUser 
 
                 return {
                     type: 'sticker',
-                    content: [
-                        { type: 'image_url', image_url: { url: stickerUrl } },
-                        { type: 'text', text: `[表情包："${stickerName}"]` }
-                    ],
+                    content: stickerUrl,  // 直接返回URL字符串
                     meaning: stickerName
                 };
             } else {
@@ -8523,7 +8528,7 @@ async function deleteSelectedWeiboPosts() {
                 return systemElement;
             }
 
-            const isUser = msg.role === 'user'; const wrapper = document.createElement('div'); wrapper.className = `message-wrapper ${isUser ? 'user' : 'ai'}`; if (chat.isGroup && !isUser) { const senderNameDiv = document.createElement('div'); senderNameDiv.className = 'sender-name'; senderNameDiv.textContent = msg.senderName || '未知成员'; wrapper.appendChild(senderNameDiv); } const bubble = document.createElement('div'); bubble.className = `message-bubble ${isUser ? 'user' : 'ai'}`; bubble.dataset.timestamp = msg.timestamp; let avatarSrc; if (chat.isGroup) { if (isUser) avatarSrc = chat.settings.myAvatar || defaultMyGroupAvatar; else { const member = chat.members.find(m => m.name === msg.senderName); avatarSrc = member ? member.avatar : defaultGroupMemberAvatar; } } else { avatarSrc = isUser ? (chat.settings.myAvatar || defaultAvatar) : (chat.settings.aiAvatar || defaultAvatar); } let contentHtml; if (msg.type === 'user_photo' || msg.type === 'ai_image') { bubble.classList.add('is-ai-image'); const altText = msg.type === 'user_photo' ? "用户描述的照片" : "AI生成的图片"; contentHtml = `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="ai-generated-image" alt="${altText}" data-description="${msg.content}">`; } else if (msg.type === 'voice_message') { bubble.classList.add('is-voice-message'); const duration = Math.max(1, Math.round((msg.content || '').length / 5)); const durationFormatted = `0:${String(duration).padStart(2, '0')}''`; const waveformHTML = '<div></div><div></div><div></div><div></div><div></div>'; contentHtml = `<div class="voice-message-body" data-text="${msg.content}"><div class="voice-waveform">${waveformHTML}</div><span class="voice-duration">${durationFormatted}</span></div>`; } else if (msg.type === 'transfer') {
+            const isUser = msg.role === 'user'; const wrapper = document.createElement('div'); wrapper.className = `message-wrapper ${isUser ? 'user' : 'ai'}`; if (chat.isGroup && !isUser) { const senderNameDiv = document.createElement('div'); senderNameDiv.className = 'sender-name'; senderNameDiv.textContent = msg.senderName || '未知成员'; wrapper.appendChild(senderNameDiv); } const bubble = document.createElement('div'); bubble.className = `message-bubble ${isUser ? 'user' : 'ai'}`; bubble.dataset.timestamp = msg.timestamp; let avatarSrc; if (chat.isGroup) { if (isUser) avatarSrc = chat.settings.myAvatar || defaultMyGroupAvatar; else { const member = chat.members.find(m => m.name === msg.senderName); avatarSrc = member ? member.avatar : defaultGroupMemberAvatar; } } else { avatarSrc = isUser ? (chat.settings.myAvatar || defaultAvatar) : (chat.settings.aiAvatar || defaultAvatar); } let contentHtml; if (msg.type === 'user_photo' || msg.type === 'ai_image') { bubble.classList.add('is-ai-image'); const altText = msg.type === 'user_photo' ? "用户描述的照片" : "AI生成的图片"; const escapedDescription = (msg.content || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); contentHtml = `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="ai-generated-image" alt="${altText}" data-description="${escapedDescription}">`; } else if (msg.type === 'voice_message') { bubble.classList.add('is-voice-message'); const duration = Math.max(1, Math.round((msg.content || '').length / 5)); const durationFormatted = `0:${String(duration).padStart(2, '0')}''`; const waveformHTML = '<div></div><div></div><div></div><div></div><div></div>'; contentHtml = `<div class="voice-message-body" data-text="${msg.content}"><div class="voice-waveform">${waveformHTML}</div><span class="voice-duration">${durationFormatted}</span></div>`; } else if (msg.type === 'transfer') {
                 bubble.classList.add('is-transfer'); 
                 const titleText = isUser ? '转账给Ta' : '收到一笔转账'; 
                 const heartIcon = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: middle;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>`; 
