@@ -1733,6 +1733,52 @@ body[data-theme="cute"] {
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
+        /* 通话加载指示器 */
+        .call-typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: #222222;
+            border: 1px solid rgba(255,255,255,0.5);
+            align-self: flex-start;
+            border-radius: 5px 15px 15px 15px;
+            font-size: 14px;
+            max-width: 80%;
+        }
+
+        .call-typing-dots {
+            display: flex;
+            gap: 4px;
+            margin-left: 8px;
+        }
+
+        .call-typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #666;
+            border-radius: 50%;
+            animation: callTypingBounce 1.4s infinite ease-in-out;
+        }
+
+        .call-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .call-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .call-typing-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes callTypingBounce {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         /* 主题选择器样式 */
         .theme-style-selector {
             display: flex;
@@ -7622,6 +7668,135 @@ async function generateAiToAiReply(postId, commentId, responderAiId, targetAiId,
     }
 }
 
+// 专门用于通话的统一API调用函数
+async function callUnifiedAPIForCall(url, key, model, messages) {
+    const isGemini = url.includes('generativelanguage.googleapis.com');
+
+    if (isGemini) {
+        // Gemini API 格式
+        const apiUrl = `${url}/models/${model}:generateContent?key=${key}`;
+
+        // 转换消息格式为Gemini格式
+        const geminiMessages = [];
+
+        // 添加系统提示词作为第一条用户消息
+        if (messages[0]?.role === 'system') {
+            geminiMessages.push({
+                role: 'user',
+                parts: [{ text: messages[0].content }]
+            });
+            geminiMessages.push({
+                role: 'model',
+                parts: [{ text: '我明白了，我会按照这些要求进行对话。' }]
+            });
+        }
+
+        // 转换其他消息
+        for (let i = 1; i < messages.length; i++) {
+            const msg = messages[i];
+            let content = '';
+
+            if (typeof msg.content === 'string') {
+                content = msg.content;
+            } else if (Array.isArray(msg.content)) {
+                content = msg.content.map(item => {
+                    if (item.type === 'text') return item.text;
+                    if (item.type === 'image_url') return '[图片]';
+                    return '';
+                }).join('');
+            }
+
+            geminiMessages.push({
+                role: msg.role === 'user' ? 'user' : 'model',
+                parts: [{ text: content }]
+            });
+        }
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: geminiMessages,
+                generationConfig: {
+                    temperature: 0.8,
+                    maxOutputTokens: 8192
+                }
+            })
+        });
+
+        if (!response.ok) {
+            console.log('Gemini API 通话请求失败:', response.status, response.statusText);
+            return null;
+        }
+
+        const data = await response.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!content) {
+            console.log('Gemini API 通话响应数据:', data);
+            return null;
+        }
+        return content;
+
+    } else {
+        // OpenAI API 格式（包括抱脸等代理）
+        const response = await fetch(`${url}/v1/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${key}`
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: messages,
+                temperature: 0.8,
+                stream: false
+            })
+        });
+
+        if (!response.ok) {
+            console.log('OpenAI格式API 通话请求失败:', response.status, response.statusText);
+            return null;
+        }
+
+        const data = await response.json();
+
+        // 增强对不同API响应格式的兼容性
+        let content = null;
+
+        // 1. 标准OpenAI格式
+        if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+            content = data.choices[0].message.content;
+        }
+        // 2. 部分代理可能直接返回message字段
+        else if (data.message) {
+            content = data.message;
+        }
+        // 3. 部分代理可能返回text字段
+        else if (data.text) {
+            content = data.text;
+        }
+        // 4. 部分代理可能返回response字段
+        else if (data.response) {
+            content = data.response;
+        }
+        // 5. 部分代理可能返回content字段
+        else if (data.content) {
+            content = data.content;
+        }
+        // 6. 部分代理可能返回result字段
+        else if (data.result) {
+            content = data.result;
+        }
+
+        if (!content) {
+            console.error('通话API无法解析响应，完整响应数据:', data);
+            return null;
+        }
+
+        return content.trim();
+    }
+}
+
 // AI反击回复
 async function generateAiCounterReply(postId, commentId, responderAiId, targetAiId, targetReplyContent) {
     const responderAi = state.chats[responderAiId];
@@ -9869,21 +10044,61 @@ async function deleteSelectedWeiboPosts() {
             }
             renderChatList();
         }
-        
+
+        // 显示通话加载指示器
+        function showCallTypingIndicator() {
+            const messagesContainer = document.getElementById('call-messages');
+
+            // 先移除已存在的指示器（如果有的话）
+            hideCallTypingIndicator();
+
+            // 创建新的加载指示器
+            const indicator = document.createElement('div');
+            indicator.className = 'call-typing-indicator';
+            indicator.id = 'call-typing-indicator';
+            indicator.innerHTML = `
+                <span>正在思考</span>
+                <div class="call-typing-dots">
+                    <div class="call-typing-dot"></div>
+                    <div class="call-typing-dot"></div>
+                    <div class="call-typing-dot"></div>
+                </div>
+            `;
+
+            // 添加到消息容器的底部
+            messagesContainer.appendChild(indicator);
+
+            // 滚动到底部显示指示器
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 隐藏通话加载指示器
+        function hideCallTypingIndicator() {
+            const indicator = document.getElementById('call-typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
         function addCallMessage(role, content, isDescription = false) {
+            // 如果是AI消息，先隐藏加载指示器
+            if (role === 'assistant') {
+                hideCallTypingIndicator();
+            }
+
             const message = {
                 role: role,
                 content: content,
                 timestamp: Date.now(),
                 isDescription: isDescription
             };
-            
+
             callState.messages.push(message);
-            
+
             // 显示在通话界面
             const messagesContainer = document.getElementById('call-messages');
             const messageEl = document.createElement('div');
-            
+
             if (isDescription) {
                 messageEl.className = 'call-message description';
                 messageEl.innerHTML = content; // 允许HTML格式化
@@ -9891,7 +10106,7 @@ async function deleteSelectedWeiboPosts() {
                 messageEl.className = `call-message ${role}`;
                 messageEl.textContent = content;
             }
-            
+
             messagesContainer.appendChild(messageEl);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -9900,11 +10115,14 @@ async function deleteSelectedWeiboPosts() {
             const input = document.getElementById('call-input');
             const content = input.value.trim();
             if (!content) return;
-            
+
             // 添加用户消息
             addCallMessage('user', content);
             input.value = '';
-            
+
+            // 显示加载指示器
+            showCallTypingIndicator();
+
             // 触发AI回应
             setTimeout(() => {
                 generateCallAiResponse(content);
@@ -10041,33 +10259,17 @@ ${sceneInstructions}
                 
                 // 添加当前用户消息
                 messages.push({ role: 'user', content: `[通话中] 用户刚刚说：${userMessage}` });
-                
-                const response = await fetch(`${proxyUrl}/v1/chat/completions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: messages,
-                        temperature: 0.8,
-                        stream: false
-                    })
-                });
-                
-                if (!response.ok) return;
-                
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content.trim();
-                
+
+                // 使用统一的API调用函数处理Gemini和其他API
+                const aiResponse = await callUnifiedAPIForCall(proxyUrl, apiKey, model, messages);
+
                 if (aiResponse) {
                     if (isVideoCall && aiResponse.includes('<desc>')) {
                         // 视频通话：分离对话和描写部分
                         const parts = aiResponse.split('<desc>');
                         const dialogPart = parts[0].trim();
                         const descPart = parts[1] ? parts[1].replace('</desc>', '').trim() : '';
-                        
+
                         if (dialogPart) {
                             addCallMessage('assistant', dialogPart);
                         }
@@ -10078,9 +10280,14 @@ ${sceneInstructions}
                         // 语音通话或没有描写的视频通话
                         addCallMessage('assistant', aiResponse);
                     }
+                } else {
+                    // 如果没有获得回应，也要隐藏加载指示器
+                    hideCallTypingIndicator();
                 }
             } catch (error) {
                 console.error('生成通话AI回应失败:', error);
+                // 出错时隐藏加载指示器
+                hideCallTypingIndicator();
             }
         }
         
@@ -10180,7 +10387,10 @@ ${sceneInstructions}
             
             // 清空消息区域
             document.getElementById('call-messages').innerHTML = '';
-            
+
+            // 显示加载指示器
+            showCallTypingIndicator();
+
             // AI主动发起通话时，先让AI说一句开场白
             setTimeout(() => {
                 generateAiCallOpening();
@@ -10258,33 +10468,17 @@ ${sceneInstructions}
                 });
                 
                 messages.push({ role: 'user', content: `[通话接通] 用户接听了你主动拨打的电话，请说开场白` });
-                
-                const response = await fetch(`${proxyUrl}/v1/chat/completions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: messages,
-                        temperature: 0.8,
-                        stream: false
-                    })
-                });
-                
-                if (!response.ok) return;
-                
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content.trim();
-                
+
+                // 使用统一的API调用函数处理Gemini和其他API
+                const aiResponse = await callUnifiedAPIForCall(proxyUrl, apiKey, model, messages);
+
                 if (aiResponse) {
                     if (isVideoCall && aiResponse.includes('<desc>')) {
                         // 视频通话：分离对话和描写部分
                         const parts = aiResponse.split('<desc>');
                         const dialogPart = parts[0].trim();
                         const descPart = parts[1] ? parts[1].replace('</desc>', '').trim() : '';
-                        
+
                         if (dialogPart) {
                             addCallMessage('assistant', dialogPart);
                         }
@@ -10295,9 +10489,14 @@ ${sceneInstructions}
                         // 语音通话或没有描写的视频通话
                         addCallMessage('assistant', aiResponse);
                     }
+                } else {
+                    // 如果没有获得回应，也要隐藏加载指示器
+                    hideCallTypingIndicator();
                 }
             } catch (error) {
                 console.error('生成AI通话开场白失败:', error);
+                // 出错时隐藏加载指示器
+                hideCallTypingIndicator();
             }
         }
         
@@ -10386,24 +10585,8 @@ JSON输出格式示例:
                 
                 messages.push({ role: 'user', content: `通话刚刚被挂断了，现在回到了手机聊天模式，请通过文字消息做出反应` });
 
-                const response = await fetch(`${proxyUrl}/v1/chat/completions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: messages,
-                        temperature: 0.8,
-                        stream: false
-                    })
-                });
-                
-                if (!response.ok) return;
-                
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content.trim();
+                // 使用统一的API调用函数处理Gemini和其他API
+                const aiResponse = await callUnifiedAPIForCall(proxyUrl, apiKey, model, messages);
                 
                 if (aiResponse) {
                     const messagesArray = parseAiResponse(aiResponse);
