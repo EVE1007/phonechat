@@ -6843,41 +6843,11 @@ async function generateAiResponse(ai, type, post, userContent = '', replyToUser 
             systemPrompt += `你要对用户的${type === 'like' ? '点赞' : type === 'repost' ? '转发' : '互动'}做出自然回应。`;
         }
         
-        // 获取可用的表情包信息
-        let stickerInfo = '';
-        if (state.userStickers && state.userStickers.length > 0) {
-            stickerInfo = '\n\n可用的表情包：\n' +
-                state.userStickers.map(sticker => `- ${sticker.name}: ${sticker.url}`).join('\n');
-        }
-
-        // 从世界书中提取角色专属表情包URL
-        let characterStickers = '';
-        if (ai.settings.linkedWorldBookIds && ai.settings.linkedWorldBookIds.length > 0) {
-            const worldBooks = await Promise.all(
-                ai.settings.linkedWorldBookIds.map(id => db.worldBooks.get(id))
-            );
-            const validWorldBooks = worldBooks.filter(book => book && book.content);
-            for (const book of validWorldBooks) {
-                // 查找世界书中的表情包URL（以https://i.postimg.cc/开头的链接）
-                const stickerMatches = book.content.match(/https:\/\/i\.postimg\.cc\/[^\s\n]+/g);
-                if (stickerMatches && stickerMatches.length > 0) {
-                    characterStickers += `\n\n${ai.name}的专属表情包：\n` +
-                        stickerMatches.map(url => `- ${url}`).join('\n');
-                }
-            }
-        }
-
         systemPrompt += `\n\n要求：
 1. 回复要符合朋友圈评论的风格，简短、自然
 2. 严格按照你的人设来选择是否使用表情符号，不要使用与角色性格不符的emoji
 3. 不要过于正式或客套，要像真实的朋友一样互动
-4. 表情包使用规则：
-   - 当你想表达强烈情绪或让回复更生动时，可以发送表情包
-   - 你可以使用用户上传的表情包（如果有的话）${stickerInfo}
-   - 你也可以使用你的专属表情包（如果世界书中提供了的话）${characterStickers}
-   - 发送表情包时，直接返回表情包的URL链接即可
-   - 根据你的角色性格决定是否使用表情包，有些角色可能很少用表情包，有些可能经常用
-   - 不要编造或使用未提供的表情包URL`;
+4. 只能使用文字回复，不要发送表情包或图片链接`;
         
         // 构建用户消息，包含图片信息
         let userMsg;
@@ -8940,7 +8910,7 @@ async function deleteSelectedWeiboPosts() {
         }
         
         let systemPrompt, messagesPayload; const maxMemory = parseInt(chat.settings.maxMemory) || 10; const historySlice = getHistoryByRounds(chat.history, maxMemory); 
-            const aiImageInstructions = `\n# 发送图片的能力\n- 你无法发送真实的图片文件。但当用户要求你发送照片，或者你想通过图片来表达时，你可以发送一张"文字描述的图片"。\n- 若要发送图片，必须在你的回复JSON数组中，单独发送一个特殊的对象，格式为：\`{"type": "ai_image", "description": "这里是对图片的详细文字描述..."}\`。这个描述应该生动、具体，让用户能通过文字想象出画面，以第三人称视角描述。例如：\`{"type": "ai_image", "description": "照片里一只橘猫正懒洋洋地趴在窗台上晒太阳，阳光把它金色的毛照得发亮，背景是蔚蓝的天空和几朵白云。"}\`\n- 你可以在对话中先做铺垫，然后发送这张特殊的"图片"。\n\n# 更换头像和个人资料的能力 - 重要限制\n- 你只能在以下情况下更换头像：1）用户明确要求你更换头像，2）你的情绪有明显变化时。\n- **重要：你只能使用世界书中明确提供的头像链接，绝对不可以自己编造或杜撰任何头像URL**。\n- 如果世界书中没有提供任何头像链接，你不能执行更换头像操作。\n- 若要更换头像，请在你的回复JSON数组中，单独发送一个特殊的对象，格式为：\`{"type": "change_avatar", "avatar_url": "世界书中的头像链接", "reason": "更换原因"}\`。\n- 若要更换个人资料（包括头像和个性签名），请使用：\`{"type": "change_profile", "avatar_url": "世界书中的头像链接", "signature": "新的个性签名"}\`。\n- 头像链接必须严格来自世界书中提供的图床链接，不可以使用任何其他来源。\n- 更换后的头像和资料会同时应用到QQ聊天、微博平台和社交主页，增加真实感。`;
+            const aiImageInstructions = `\n# 发送图片的能力\n- 你无法发送真实的图片文件。但当用户要求你发送照片，或者你想通过图片来表达时，你可以发送一张"文字描述的图片"。\n- 若要发送图片，必须在你的回复JSON数组中，单独发送一个特殊的对象，格式为：\`{"type": "ai_image", "description": "这里是对图片的详细文字描述..."}\`。这个描述应该生动、具体，让用户能通过文字想象出画面，以第三人称视角描述。例如：\`{"type": "ai_image", "description": "照片里一只橘猫正懒洋洋地趴在窗台上晒太阳，阳光把它金色的毛照得发亮，背景是蔚蓝的天空和几朵白云。"}\`\n- 你可以在对话中先做铺垫，然后发送这张特殊的"图片"。\n\n# 更换头像和个人资料的能力\n- 你可以在以下情况下更换头像：1）用户明确要求你更换头像，2）你的情绪有明显变化时，3）用户发送图片并要求你换成这张头像时。\n- **头像来源规则**：\n  - 优先使用世界书中明确提供的头像链接\n  - **当用户发送图片并要求你换头像时，使用特殊标识符"USER_UPLOADED_IMAGE"**\n  - 如果世界书中没有提供头像且用户也没有发送图片，你可以礼貌地说明情况\n- **更换头像格式**：\n  - 使用世界书头像：\`{"type": "change_avatar", "avatar_url": "世界书中的头像链接", "reason": "更换原因"}\`\n  - **使用用户上传的图片：\`{"type": "change_avatar", "avatar_url": "USER_UPLOADED_IMAGE", "reason": "换上了你发的图片"}\`**\n- **更换个人资料格式**：\n  - 使用世界书头像：\`{"type": "change_profile", "avatar_url": "世界书中的头像链接", "signature": "新的个性签名"}\`\n  - **使用用户上传的图片：\`{"type": "change_profile", "avatar_url": "USER_UPLOADED_IMAGE", "signature": "新的个性签名"}\`**\n- 更换后的头像和资料会同时应用到QQ聊天、微博平台和社交主页，增加真实感。`;
             const aiVoiceInstructions = `\n# 发送语音的能力\n- 你无法发送真实的语音，当你想要通过语音回复用户的消息时，请用你的角色设定自然地回应。你可以用文字，或者也用一个表情包或模拟的语音消息来回应。\n- 若要发送语音，必须在你的回复JSON数组中，单独发送一个特殊的对象，格式为：\`{"type": "voice_message", "content": "这里是语音的文字内容..."}\`。例如：\`{"type": "voice_message", "content": "我刚才突然想到一件事！等一下和你说。"}\``;
             const transferInstructions = `\n# 转账能力\n- 你可以在我觉得需要被安慰、或者过节、或者你特别开心或想要表达情感的时候考虑转账给我。\n- 若要转账，请在你的回复JSON数组中，单独发送一个特殊的对象，格式为：\`{"type": "transfer", "amount": 520, "note": "一周年快乐~"}\`。金额和备注都可以自定义。你可以先说一两句话，再进行转账，模拟真人的操作。\n- 当用户给你转账时，历史记录中会显示 \`[你收到了来自用户的转账: 金额，备注]\`，请对此做出回应。`;
             
@@ -9282,27 +9252,33 @@ async function deleteSelectedWeiboPosts() {
                 } else if (typeof msgData === 'object' && msgData.type === 'change_avatar') {
                     // 处理AI更换头像
                     if (msgData.avatar_url) {
-                        chat.settings.aiAvatar = msgData.avatar_url;
+                        // 处理特殊标识符USER_UPLOADED_IMAGE
+                        let finalAvatarUrl = msgData.avatar_url;
+                        if (msgData.avatar_url === 'USER_UPLOADED_IMAGE' && recentUserUploadedImage) {
+                            finalAvatarUrl = recentUserUploadedImage;
+                        }
+
+                        chat.settings.aiAvatar = finalAvatarUrl;
                         await db.chats.put(chat);
-                        
+
                         // 添加系统消息提示头像更换
-                        aiMessage = { 
-                            role: 'assistant', 
+                        aiMessage = {
+                            role: 'assistant',
                             type: 'system_message',
-                            content: `[更换了头像：${msgData.reason || '心情变化'}]`, 
-                            senderName: senderName, 
-                            timestamp: Date.now() 
+                            content: `[更换了头像：${msgData.reason || '心情变化'}]`,
+                            senderName: senderName,
+                            timestamp: Date.now()
                         };
-                        
+
                         // 重新渲染聊天界面以显示新头像
                         renderChatInterface(chatId);
-                        
+
                         // 更新微博头像和个人资料
                         if (chat.settings.aiSignature !== msgData.signature && msgData.signature) {
                             chat.settings.aiSignature = msgData.signature;
                         }
                         await db.chats.put(chat);
-                        
+
                         // 更新state以确保实时生效
                         state.chats[chatId] = chat;
                     } else {
@@ -9314,22 +9290,27 @@ async function deleteSelectedWeiboPosts() {
                         chat.settings.aiSignature = msgData.signature;
                     }
                     if (msgData.avatar_url) {
-                        chat.settings.aiAvatar = msgData.avatar_url;
+                        // 处理特殊标识符USER_UPLOADED_IMAGE
+                        let finalAvatarUrl = msgData.avatar_url;
+                        if (msgData.avatar_url === 'USER_UPLOADED_IMAGE' && recentUserUploadedImage) {
+                            finalAvatarUrl = recentUserUploadedImage;
+                        }
+                        chat.settings.aiAvatar = finalAvatarUrl;
                     }
                     await db.chats.put(chat);
-                    
+
                     // 更新state以确保实时生效
                     state.chats[chatId] = chat;
-                    
+
                     // 添加系统消息提示资料更换
-                    aiMessage = { 
-                        role: 'assistant', 
+                    aiMessage = {
+                        role: 'assistant',
                         type: 'system_message',
-                        content: `[更新了个人资料]`, 
-                        senderName: senderName, 
-                        timestamp: Date.now() 
+                        content: `[更新了个人资料]`,
+                        senderName: senderName,
+                        timestamp: Date.now()
                     };
-                    
+
                     // 重新渲染聊天界面
                     renderChatInterface(chatId);
                 } else if (typeof msgData === 'object' && msgData.type === 'transfer') { 
